@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus Digital Twin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F4F6F5;
+            --panel: #FFFFFF;
+            --ink: #171E26;
+            --muted: #6B7580;
+            --line: #E4E7E4;
+            --teal: #147D68;
+            --teal-bg: #E1F2ED;
+            --amber: #A6690D;
+            --amber-bg: #FBEEDA;
+            --red: #A83A32;
+            --red-bg: #FBE7E5;
+            --blue: #1E5FA8;
+            --blue-bg: #E6F0FB;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            margin: 0;
+        }
+
+        .mono {
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 20px 16px 60px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .brand h1 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .brand .sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .live {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--teal);
+        }
+
+        section {
+            margin-bottom: 22px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 10px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .kpi {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+
+        .kpi .label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .kpi .value {
+            font-size: 19px;
+            font-weight: 600;
+            margin-top: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .kpi .sub {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .alerts-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .alert-item.danger {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .alert-item.warning {
+            background: var(--amber-bg);
+            color: var(--amber);
+        }
+
+        .alert-item.info {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+
+        .no-alerts {
+            font-size: 13px;
+            color: var(--muted);
+            padding: 8px 2px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 14px;
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .card-head h3 {
+            font-size: 16px;
+        }
+
+        .card-head .loc {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .badge.idle {
+            background: #EEEFEA;
+            color: var(--muted);
+        }
+
+        .badge.occupied {
+            background: var(--teal-bg);
+            color: var(--teal);
+        }
+
+        .badge.unattended {
+            background: var(--amber-bg);
+            color: var(--amber);
+        }
+
+        .badge.fire {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .conn {
+            font-size: 11px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .conn .cdot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--teal);
+        }
+
+        .readouts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 7px 16px;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .readouts div {
+            display: flex;
+            justify-content: space-between;
+            color: var(--muted);
+        }
+
+        .readouts div span:last-child {
+            color: var(--ink);
+            font-weight: 500;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+        }
+
+        .health-bar {
+            height: 5px;
+            border-radius: 3px;
+            background: #EEEFEA;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: var(--teal);
+        }
+
+        .controls {
+            border-top: 1px solid var(--line);
+            padding-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .control-row .name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .switch {
+            position: relative;
+            width: 42px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #D8DAD3;
+            border-radius: 999px;
+            transition: 0.15s;
+        }
+
+        .slider::before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.15s;
+        }
+
+        input:checked+.slider {
+            background: var(--teal);
+        }
+
+        input:checked+.slider::before {
+            transform: translateX(18px);
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .panel-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .panel-head h3 {
+            font-size: 15px;
+        }
+
+        .panel-head .note {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .ai-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+        }
+
+        .predict-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--line);
+            font-size: 13px;
+        }
+
+        .predict-row:last-child {
+            border-bottom: none;
+        }
+
+        .predict-row .val {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 500;
+        }
+
+        .confidence {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .tariff-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .tariff-input input {
+            width: 80px;
+            padding: 6px 8px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+        }
+
+        .rec-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--line);
+            font-size: 13px;
+        }
+
+        .rec-item:last-child {
+            border-bottom: none;
+        }
+
+        .rec-item .save {
+            color: var(--teal);
+            font-weight: 600;
+            white-space: nowrap;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+        }
+
+        .assistant-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .assistant-box input {
+            flex: 1;
+            padding: 9px 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .assistant-box button {
+            padding: 9px 16px;
+            border: none;
+            background: var(--ink);
+            color: white;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .chip {
+            font-size: 11px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: #EEEFEA;
+            color: var(--muted);
+            cursor: pointer;
+            border: none;
+        }
+
+        .chip:hover {
+            background: #E2E4DD;
+        }
+
+        .assistant-answer {
+            font-size: 13px;
+            background: #F7F8F5;
+            border-radius: 8px;
+            padding: 10px 12px;
+            min-height: 20px;
+            white-space: pre-line;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 30px;
+        }
+
+        @media (max-width: 700px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <header>
+            <div class="brand">
+                <h1>Smart campus digital twin</h1>
+                <div class="sub">AI-powered energy analytics · replace with your college name</div>
+            </div>
+            <div class="live"><span class="dot" id="live-dot"></span> Live · <span id="clock" class="mono"></span></div>
+        </header>
+
+        <section>
+            <div class="section-title">Campus overview</div>
+            <div class="kpi-grid">
+                <div class="kpi">
+                    <div class="label">Occupancy</div>
+                    <div class="value" id="k-occ">--</div>
+                    <div class="sub" id="k-occ-pct">--</div>
+                </div>
+                <div class="kpi">
+                    <div class="label">Today's energy</div>
+                    <div class="value" id="k-energy">--</div>
+                </div>
+                <div class="kpi">
+                    <div class="label">Today's cost</div>
+                    <div class="value" id="k-cost">--</div>
+                </div>
+                <div class="kpi">
+                    <div class="label">Predicted monthly bill</div>
+                    <div class="value" id="k-monthly">--</div>
+                </div>
+                <div class="kpi">
+                    <div class="label">Carbon emission today</div>
+                    <div class="value" id="k-carbon">--</div>
+                </div>
+                <div class="kpi">
+                    <div class="label">Efficiency score</div>
+                    <div class="value" id="k-eff">--</div>
+                    <div class="sub" id="k-eff-label">--</div>
+                </div>
+                <div class="kpi">
+                    <div class="label">Active / idle rooms</div>
+                    <div class="value" id="k-rooms">--</div>
+                </div>
+                <div class="kpi">
+                    <div class="label">Alert rooms</div>
+                    <div class="value" id="k-alerts">--</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-title">Alerts</div>
+            <div class="alerts-feed" id="alerts-feed"></div>
+        </section>
+
+        <section>
+            <div class="section-title">Classrooms</div>
+            <div class="grid" id="room-grid"></div>
+        </section>
+
+        <section>
+            <div class="section-title">AI analytics</div>
+            <div class="ai-grid">
+
+                <div class="panel">
+                    <div class="panel-head">
+                        <h3>Occupancy prediction</h3><span class="note">based on time &amp; trend</span>
+                    </div>
+                    <div class="predict-row"><span>Next 30 min</span><span class="val" id="p-30">--</span></div>
+                    <div class="predict-row"><span>Next 1 hour</span><span class="val" id="p-60">--</span></div>
+                    <div class="predict-row"><span>Tomorrow, same time</span><span class="val" id="p-tmr">--</span>
+                    </div>
+                    <div class="confidence" id="p-conf" style="margin-top:8px;"></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head">
+                        <h3>Cost prediction</h3>
+                    </div>
+                    <div class="tariff-input">
+                        <label for="tariff">Tariff ₹/kWh</label>
+                        <input type="number" id="tariff" value="8.20" step="0.1" min="1">
+                    </div>
+                    <div class="predict-row"><span>Today</span><span class="val" id="c-today">--</span></div>
+                    <div class="predict-row"><span>This week</span><span class="val" id="c-week">--</span></div>
+                    <div class="predict-row"><span>This month</span><span class="val" id="c-month">--</span></div>
+                    <div class="predict-row"><span>This year</span><span class="val" id="c-year">--</span></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head">
+                        <h3>Recommendations</h3>
+                    </div>
+                    <div id="rec-list"></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head">
+                        <h3>Ask the assistant</h3><span class="note">rule-based, runs on live data</span>
+                    </div>
+                    <div class="assistant-box">
+                        <input type="text" id="q-input" placeholder="Which classroom wastes the most electricity?">
+                        <button onclick="askAssistant()">Ask</button>
+                    </div>
+                    <div class="chip-row">
+                        <button class="chip" onclick="askPreset('waste')">Most wasteful room</button>
+                        <button class="chip" onclick="askPreset('hot')">Rooms above 30°C</button>
+                        <button class="chip" onclick="askPreset('bill')">Predicted monthly bill</button>
+                        <button class="chip" onclick="askPreset('crowd')">Overcrowded rooms</button>
+                    </div>
+                    <div class="assistant-answer" id="assistant-answer">Ask a question or tap a suggestion above.</div>
+                </div>
+
+            </div>
+        </section>
+
+        <section>
+            <div class="section-title">Energy trend</div>
+            <div class="panel">
+                <div class="panel-head">
+                    <h3>Predicted energy, next 12 hours</h3><span class="note" id="ai-summary"></span>
+                </div>
+                <svg id="forecast-svg" viewBox="0 0 600 90" style="width:100%; height:90px; display:block;"></svg>
+            </div>
+        </section>
+
+        <footer>Built for the MSME Idea Hackathon &middot; digital twin prototype &middot; all figures are simulated
+            placeholder data</footer>
+    </div>
+
+    <script>
+        /*
+          TEAM NOTE — wiring this to real hardware and a real AI backend:
+          1. Replace `rooms` below with data streamed from Firebase
+             (onValue(ref(db, 'rooms')) -> map into this same shape).
+          2. `toggleDevice()` only updates local state today -- make it also
+             write to Firebase (set(ref(db, `rooms/${id}/${device}`), value))
+             so the ESP32 relay actually receives the command.
+          3. `askAssistant()` is pure keyword matching over local data, not an
+             LLM. To make it a real AI assistant, send the question + a JSON
+             snapshot of `rooms` to your backend (or the Claude/OpenAI API) and
+             render the response text here instead.
+          4. Occupancy/cost predictions are simple heuristics for the demo --
+             swap `predictOccupancy()` and the cost projections for your actual
+             regression model's output.
+          5. `tariff` is user-editable in the UI; persist it wherever you like
+             (Firebase, localStorage in your own deployment -- not in this
+             artifact preview) so it survives a refresh.
+        */
+
+        let tariff = 8.20;
+        const CARBON_FACTOR = 0.82; // kg CO2 per kWh, India grid average
+
+        const rooms = [
+            { id: 'Classroom 101', building: 'Building A', cap: 60, temp: 27.5, hum: 55, aq: 'good', smoke: 'normal', light: true, fan: true, ac: false, health: 94, connected: true },
+            { id: 'Classroom 102', building: 'Building A', cap: 60, temp: 26.8, hum: 52, aq: 'good', smoke: 'normal', light: false, fan: false, ac: false, health: 88, connected: true },
+            { id: 'Classroom 103', building: 'Building A', cap: 60, temp: 28.4, hum: 58, aq: 'moderate', smoke: 'normal', light: true, fan: true, ac: true, health: 76, connected: true },
+            { id: 'Classroom 201', building: 'Building B', cap: 60, temp: 27.0, hum: 50, aq: 'good', smoke: 'normal', light: false, fan: false, ac: false, health: 91, connected: true },
+            { id: 'Classroom 202', building: 'Building B', cap: 60, temp: 29.6, hum: 60, aq: 'moderate', smoke: 'normal', light: true, fan: true, ac: true, health: 68, connected: true },
+            { id: 'Classroom 203', building: 'Building B', cap: 60, temp: 26.4, hum: 49, aq: 'good', smoke: 'normal', light: false, fan: false, ac: false, health: 97, connected: true },
+        ].map(r => ({ ...r, occ: Math.floor(Math.random() * r.cap * 0.6), power: +(Math.random() * 2.5 + 0.5).toFixed(2), manual: {} }));
+
+        function fmt1(n) { return (Math.round(n * 10) / 10).toFixed(1); }
+        function fmt2(n) { return (Math.round(n * 100) / 100).toFixed(2); }
+        function inr(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+
+        function toggleDevice(id, device) {
+            const r = rooms.find(r => r.id === id);
+            r[device] = !r[device];
+            r.manual[device] = true;
+            r.power = Math.max(0.1, r.power + (r[device] ? 0.4 : -0.4));
+            renderAll();
+        }
+        window.toggleDevice = toggleDevice;
+
+        function totalPower() { return rooms.reduce((s, r) => s + r.power, 0); }
+        function todayEnergyKwh() { return totalPower() * 8; }
+
+        function renderRooms() {
+            const grid = document.getElementById('room-grid');
+            grid.innerHTML = rooms.map(r => {
+                const fire = r.temp > 32;
+                const unattended = r.occ === 0 && (r.light || r.fan || r.ac);
+                const active = r.occ > 0;
+                let cls = 'idle', label = 'idle';
+                if (fire) { cls = 'fire'; label = 'fire risk'; }
+                else if (unattended) { cls = 'unattended'; label = 'unattended'; }
+                else if (active) { cls = 'occupied'; label = 'occupied'; }
+                const todayCost = r.power * 8 * tariff;
+                return `
+    <div class="card">
+      <div class="card-head">
+        <div><h3>${r.id}</h3><div class="loc">${r.building} &middot; cap ${r.cap}</div></div>
+        <span class="badge ${cls}">${label}</span>
+      </div>
+      <div class="conn"><span class="cdot"></span>${r.connected ? 'Connected' : 'Offline'}</div>
+      <div class="readouts">
+        <div><span>Occupancy</span><span>${r.occ}/${r.cap}</span></div>
+        <div><span>Temp</span><span>${fmt1(r.temp)}°C</span></div>
+        <div><span>Humidity</span><span>${Math.round(r.hum)}%</span></div>
+        <div><span>Air quality</span><span>${r.aq}</span></div>
+        <div><span>Smoke</span><span>${r.smoke}</span></div>
+        <div><span>Power</span><span>${fmt2(r.power)} kW</span></div>
+        <div><span>Today's cost</span><span>${inr(todayCost)}</span></div>
+        <div><span>Equip. health</span><span>${r.health}%</span></div>
+      </div>
+      <div class="health-bar"><div class="health-fill" style="width:${r.health}%; background:${r.health < 70 ? 'var(--amber)' : 'var(--teal)'}"></div></div>
+      <div class="controls">
+        <div class="control-row"><span class="name">Lights</span><label class="switch"><input type="checkbox" ${r.light ? 'checked' : ''} onchange="toggleDevice('${r.id}','light')"><span class="slider"></span></label></div>
+        <div class="control-row"><span class="name">Fan</span><label class="switch"><input type="checkbox" ${r.fan ? 'checked' : ''} onchange="toggleDevice('${r.id}','fan')"><span class="slider"></span></label></div>
+        <div class="control-row"><span class="name">AC</span><label class="switch"><input type="checkbox" ${r.ac ? 'checked' : ''} onchange="toggleDevice('${r.id}','ac')"><span class="slider"></span></label></div>
+      </div>
+    </div>`;
+            }).join('');
+        }
+
+        function computeEfficiency() {
+            const occ = rooms.reduce((s, r) => s + r.occ, 0);
+            const cap = rooms.reduce((s, r) => s + r.cap, 0);
+            const occEff = Math.min(100, (occ / cap) * 160);
+            const wasted = rooms.filter(r => r.occ === 0 && (r.light || r.fan || r.ac)).length;
+            const energyEff = Math.max(0, 100 - wasted * 15);
+            const healthEff = rooms.reduce((s, r) => s + r.health, 0) / rooms.length;
+            const aqEff = rooms.every(r => r.aq === 'good') ? 100 : 80;
+            const score = Math.round(occEff * 0.25 + energyEff * 0.3 + healthEff * 0.3 + aqEff * 0.15);
+            let label = 'Poor';
+            if (score >= 85) label = 'Excellent'; else if (score >= 70) label = 'Good'; else if (score >= 50) label = 'Average';
+            return { score: Math.min(100, score), label };
+        }
+
+        function renderKpis() {
+            const occ = rooms.reduce((s, r) => s + r.occ, 0);
+            const cap = rooms.reduce((s, r) => s + r.cap, 0);
+            const energy = todayEnergyKwh();
+            const cost = energy * tariff;
+            const monthly = cost * 30;
+            const carbon = energy * CARBON_FACTOR;
+            const unattended = rooms.filter(r => r.occ === 0 && (r.light || r.fan || r.ac));
+            const fireRooms = rooms.filter(r => r.temp > 32);
+            const active = rooms.filter(r => r.occ > 0).length;
+            const idle = rooms.length - active;
+            const eff = computeEfficiency();
+
+            document.getElementById('k-occ').textContent = `${occ} / ${cap}`;
+            document.getElementById('k-occ-pct').textContent = `${Math.round((occ / cap) * 100)}% of capacity`;
+            document.getElementById('k-energy').textContent = `${fmt1(energy)} kWh`;
+            document.getElementById('k-cost').textContent = inr(cost);
+            document.getElementById('k-monthly').textContent = inr(monthly);
+            document.getElementById('k-carbon').textContent = `${fmt1(carbon)} kg`;
+            document.getElementById('k-eff').textContent = eff.score;
+            document.getElementById('k-eff-label').textContent = eff.label;
+            document.getElementById('k-rooms').textContent = `${active} / ${idle}`;
+            document.getElementById('k-alerts').textContent = unattended.length + fireRooms.length;
+
+            const feed = document.getElementById('alerts-feed');
+            const items = [];
+            fireRooms.forEach(r => items.push({ type: 'danger', text: `${r.id}: temperature ${fmt1(r.temp)}°C -- fire risk elevated.` }));
+            unattended.forEach(r => items.push({ type: 'warning', text: `${r.id}: empty with devices still on -- tap the switch to turn them off.` }));
+            rooms.filter(r => r.health < 70).forEach(r => items.push({ type: 'info', text: `${r.id}: equipment health at ${r.health}% -- schedule maintenance soon.` }));
+            feed.innerHTML = items.length
+                ? items.map(a => `<div class="alert-item ${a.type}">${a.text}</div>`).join('')
+                : `<div class="no-alerts">No active alerts. All classrooms operating normally.</div>`;
+        }
+
+        function predictOccupancy() {
+            const occ = rooms.reduce((s, r) => s + r.occ, 0);
+            const cap = rooms.reduce((s, r) => s + r.cap, 0);
+            const hour = new Date().getHours();
+            const classInSession = hour >= 9 && hour <= 16;
+            const trend = classInSession ? 1.08 : 0.85;
+            const p30 = Math.min(cap, Math.round(occ * (classInSession ? 1.04 : 0.95)));
+            const p60 = Math.min(cap, Math.round(occ * trend));
+            const pTmr = Math.min(cap, Math.round(occ * (0.9 + Math.random() * 0.2)));
+            document.getElementById('p-30').textContent = `${p30} students`;
+            document.getElementById('p-60').textContent = `${p60} students`;
+            document.getElementById('p-tmr').textContent = `${pTmr} students`;
+            document.getElementById('p-conf').textContent = `Confidence: ${78 + Math.round(Math.random() * 12)}% · based on time of day and current trend`;
+        }
+
+        function renderCostPrediction() {
+            const energy = todayEnergyKwh();
+            const today = energy * tariff;
+            const week = today * 7;
+            const month = today * 30;
+            const year = today * 365;
+            document.getElementById('c-today').textContent = inr(today);
+            document.getElementById('c-week').textContent = inr(week);
+            document.getElementById('c-month').textContent = inr(month);
+            document.getElementById('c-year').textContent = inr(year);
+        }
+
+        function renderRecommendations() {
+            const recs = [];
+            rooms.filter(r => r.occ === 0 && (r.light || r.fan || r.ac)).forEach(r => {
+                const monthlySaving = r.power * 24 * 30 * tariff * 0.3;
+                recs.push({ text: `${r.id} is empty but devices are on. Turn them off.`, save: `Save ${inr(monthlySaving)}/mo` });
+            });
+            rooms.filter(r => r.health < 75).forEach(r => {
+                recs.push({ text: `${r.id} equipment health is low (${r.health}%). Schedule inspection.`, save: 'Avoid downtime' });
+            });
+            if (recs.length === 0) recs.push({ text: 'No waste detected right now -- all rooms are running efficiently.', save: '' });
+            document.getElementById('rec-list').innerHTML = recs.slice(0, 4).map(r =>
+                `<div class="rec-item"><span>${r.text}</span><span class="save">${r.save}</span></div>`
+            ).join('');
+        }
+
+        function renderForecast() {
+            const svg = document.getElementById('forecast-svg');
+            const base = totalPower();
+            const points = Array.from({ length: 12 }, (_, i) => {
+                const drift = Math.sin(i / 2) * 0.5 + (Math.random() - 0.5) * 0.3;
+                return Math.max(0.5, base * 0.8 + drift);
+            });
+            const w = 600, h = 90, pad = 6;
+            const max = Math.max(...points), min = Math.min(...points);
+            const range = Math.max(max - min, 0.1);
+            const stepX = (w - pad * 2) / (points.length - 1);
+            const coords = points.map((p, i) => [pad + i * stepX, h - pad - ((p - min) / range) * (h - pad * 2)]);
+            const path = coords.map((c, i) => (i === 0 ? `M${c[0]},${c[1]}` : `L${c[0]},${c[1]}`)).join(' ');
+            svg.innerHTML = `<path d="${path}" fill="none" stroke="#147D68" stroke-width="2"/>` +
+                coords.map(c => `<circle cx="${c[0]}" cy="${c[1]}" r="2.5" fill="#147D68"/>`).join('');
+            document.getElementById('ai-summary').textContent = `Peak ~${fmt2(max)} kW expected`;
+        }
+
+        function askPreset(kind) {
+            const map = {
+                waste: 'Which classroom wastes the most electricity?',
+                hot: 'Show rooms above 30 degrees',
+                bill: "Predict next month's bill",
+                crowd: 'Which classrooms are overcrowded?'
+            };
+            document.getElementById('q-input').value = map[kind];
+            askAssistant();
+        }
+        window.askPreset = askPreset;
+
+        function askAssistant() {
+            const q = document.getElementById('q-input').value.toLowerCase();
+            const out = document.getElementById('assistant-answer');
+            let answer = "I didn't catch that -- try one of the suggestions above.";
+
+            if (q.includes('waste') || q.includes('electricity')) {
+                const idle = rooms.filter(r => r.occ === 0 && (r.light || r.fan || r.ac)).sort((a, b) => b.power - a.power);
+                answer = idle.length
+                    ? `${idle[0].id} is wasting the most: empty but drawing ${fmt2(idle[0].power)} kW.`
+                    : 'No classroom is currently wasting electricity.';
+            } else if (q.includes('30') || q.includes('hot')) {
+                const hot = rooms.filter(r => r.temp > 30);
+                answer = hot.length ? `Above 30°C: ${hot.map(r => `${r.id} (${fmt1(r.temp)}°C)`).join(', ')}` : 'No classrooms are above 30°C right now.';
+            } else if (q.includes('bill') || q.includes('month')) {
+                const monthly = todayEnergyKwh() * tariff * 30;
+                answer = `Predicted next month's bill: ${inr(monthly)} at ₹${tariff}/kWh.`;
+            } else if (q.includes('overcrowd') || q.includes('crowd')) {
+                const crowded = rooms.filter(r => r.occ / r.cap > 0.85);
+                answer = crowded.length ? `Overcrowded: ${crowded.map(r => r.id).join(', ')}` : 'No classrooms are overcrowded.';
+            } else if ((q.includes('building') && q.includes('bill')) || q.includes('highest')) {
+                const byBuilding = {};
+                rooms.forEach(r => { byBuilding[r.building] = (byBuilding[r.building] || 0) + r.power; });
+                const top = Object.entries(byBuilding).sort((a, b) => b[1] - a[1])[0];
+                answer = `${top[0]} has the highest current load at ${fmt2(top[1])} kW.`;
+            } else if (q.includes('maintenance') || q.includes('health')) {
+                const low = rooms.filter(r => r.health < 80);
+                answer = low.length ? `Needs maintenance: ${low.map(r => `${r.id} (${r.health}%)`).join(', ')}` : 'All equipment is in good health.';
+            } else if (q.includes('save') || q.includes('saving')) {
+                const idle = rooms.filter(r => r.occ === 0 && (r.light || r.fan || r.ac));
+                const saving = idle.reduce((s, r) => s + r.power * 24 * 30 * tariff * 0.3, 0);
+                answer = idle.length ? `Turning off idle devices could save about ${inr(saving)}/month.` : 'No immediate savings available -- nothing is idle right now.';
+            }
+            out.textContent = answer;
+        }
+        window.askAssistant = askAssistant;
+
+        function renderAll() {
+            renderRooms();
+            renderKpis();
+            predictOccupancy();
+            renderCostPrediction();
+            renderRecommendations();
+            renderForecast();
+        }
+
+        function tick() {
+            rooms.forEach(r => {
+                r.temp += (Math.random() - 0.5) * 0.3;
+                if (Math.random() < 0.015) r.temp += 3;
+                r.hum += (Math.random() - 0.5) * 1.5;
+                if (!r.manual.light && Math.random() < 0.03) r.light = !r.light;
+                if (!r.manual.fan && Math.random() < 0.03) r.fan = !r.fan;
+                r.power = Math.max(0.1, r.power + (Math.random() - 0.5) * 0.15);
+                if (Math.random() < 0.1) r.occ = Math.max(0, Math.min(r.cap, r.occ + Math.round((Math.random() - 0.5) * 8)));
+                if (Math.random() < 0.05) r.aq = r.aq === 'good' ? 'moderate' : 'good';
+                if (Math.random() < 0.01) r.health = Math.max(50, r.health - 1);
+            });
+            renderAll();
+        }
+
+        document.getElementById('tariff').addEventListener('input', (e) => {
+            tariff = parseFloat(e.target.value) || 8.20;
+            renderAll();
+        });
+
+        document.getElementById('q-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') askAssistant(); });
+
+        function updateClock() { document.getElementById('clock').textContent = new Date().toLocaleTimeString(); }
+
+        renderAll();
+        updateClock();
+        setInterval(tick, 3000);
+        setInterval(updateClock, 1000);
+        setInterval(() => { const d = document.getElementById('live-dot'); d.style.opacity = d.style.opacity === '0.3' ? '1' : '0.3'; }, 800);
+    </script>
+</body>
+
+</html>
